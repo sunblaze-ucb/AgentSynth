@@ -1,0 +1,7 @@
+requests
+tqdm
+matplotlib
+pillow
+datasets
+openai 
+desktop_env

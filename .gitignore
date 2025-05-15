@@ -172,3 +172,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Other files
+insta_data/insta
+insta_data/output
+insta_data/secrets.json
