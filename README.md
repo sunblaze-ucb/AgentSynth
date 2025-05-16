@@ -5,7 +5,7 @@ Below are instructions to run our pipeline:
 
 ### OSWorld
 
-*TODO*
+Please refer to https://github.com/xlang-ai/OSWorld for environment setup.
 
 ### InSTA
 
@@ -26,3 +26,7 @@ Load your secret API keys in a file called `insta_data\secrets.json`. Finally, r
 python combined_task_generation_new.py --env insta
 ```
 For troubleshooting your InSTA installation, refer to their repository at https://github.com/data-for-agents/insta/tree/main.
+
+
+### Data
+https://huggingface.co/datasets/sunblaze-ucb/AgentSynth
