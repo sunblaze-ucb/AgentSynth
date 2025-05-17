@@ -1,6 +1,8 @@
 # AgentSynth
 AgentSynth: Scalable Task Generation for Generalist Computer-Use Agents
 
+See https://huggingface.co/datasets/sunblaze-ucb/AgentSynth for our data.
+
 Below are instructions to run our pipeline:
 
 ### OSWorld
