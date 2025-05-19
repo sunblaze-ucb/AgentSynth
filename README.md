@@ -9,6 +9,11 @@ Below are instructions to run our pipeline:
 
 Please refer to https://github.com/xlang-ai/OSWorld for environment setup.
 
+To generate tasks and trajectories:
+```
+python generate_and_save_traces_persona.py
+```
+
 ### InSTA
 
 First clone the repository into the insta folder using the following command:
