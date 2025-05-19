@@ -418,7 +418,7 @@ def decode_image_from_variable(base64_string):
 
 
 def select_persona():
-    with open('persona.jsonl', 'r') as file:
+    with open('persona.jsonl', 'r', encoding='utf-8') as file:
         data = file.readlines()
     selected_persona = random.choice(data)
     selected_persona = json.loads(selected_persona)
