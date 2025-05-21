@@ -64,19 +64,18 @@ def update_trace(ret, task_history, task, thoughts, actions, commands, b64_list,
         data_save['screenshots'].append(b64_list)
         data_save['done'].append(True)
     else:
+        failure_task_history.append(task)
         task = generate_subtask_summary(b64_list)
         if task is not None:
             task_history.append(task)
             key_info = generate_key_info(task, thoughts, b64_list)
             info_history.append(key_info)
-
             data_save['thoughts'].append(thoughts)
             data_save['actions'].append(actions)
             data_save['commands'].append(commands)
             data_save['screenshots'].append(b64_list)
             data_save['done'].append(False)
-        else:
-            failure_task_history.append(task)
+
     
     return task_history, info_history, data_save, failure_task_history
 
