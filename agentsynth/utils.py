@@ -24,10 +24,10 @@ headers = {
 
 def call_llms(sys_prompt, user_prompt, img, model = 'gpt-4.1'):
     if type(img) == list:
-        screenshots_payload = [{"type": "image_url", "image_url": f"data:image/png;base64,{item}"} for item in img]
+        screenshots_payload = [{"type": "image_url", "image_url": {'url':f"data:image/png;base64,{item}"}} for item in img]
     else:
-        screenshots_payload = [{"type": "image_url", "image_url": f"data:image/png;base64,{img}"}]
-
+        screenshots_payload = [{"type": "image_url", "image_url": {'url':f"data:image/png;base64,{img}"}}]
+      
     client = openai.OpenAI(
     api_key = OPENAI_API_KEY,
     )
@@ -311,7 +311,7 @@ def generate_summary(task_history, img):
     user_prompt = f"Given the subtasks history {task_history} and the final screenshot, what would be a single task description that will be accomplished by performing these subtasks in the given sequence?"
     while True:
         try:
-            llm_output = call_llms(sys_prompt, user_prompt, img)
+            llm_output = call_gpt(sys_prompt, user_prompt, img)
             task_info = parse_json(llm_output)['task']
             break
         except Exception as e:
