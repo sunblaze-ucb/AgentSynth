@@ -1,7 +1,7 @@
 # AgentSynth
 ## AgentSynth: Scalable Task Generation for Generalist Computer-Use Agents
 
-![](https://github.com/sunblaze-ucb/AgentSynth/blob/main/Pipeline4.png?raw=true)
+![](Pipeline4.png?raw=true)
 
 See https://huggingface.co/datasets/sunblaze-ucb/AgentSynth for our data.
 
@@ -10,6 +10,11 @@ Below are instructions to run our pipeline:
 ### OSWorld
 
 Please refer to https://github.com/xlang-ai/OSWorld for environment setup.
+
+To install requirements:
+```
+pip install -r requirements.txt
+```
 
 To generate tasks and trajectories:
 ```
