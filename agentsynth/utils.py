@@ -27,7 +27,7 @@ def call_llms(sys_prompt, user_prompt, img, model = 'gpt-4.1'):
         screenshots_payload = [{"type": "image_url", "image_url": {'url':f"data:image/png;base64,{item}"}} for item in img]
     else:
         screenshots_payload = [{"type": "image_url", "image_url": {'url':f"data:image/png;base64,{img}"}}]
-      
+
     client = openai.OpenAI(
     api_key = OPENAI_API_KEY,
     )
@@ -59,13 +59,9 @@ def call_llms(sys_prompt, user_prompt, img, model = 'gpt-4.1'):
         ]
     )
 
-    # if response.status != 'completed':
-    #     print(f"Error: {response.status}")
-    #     raise Exception("API call failed")
     current_date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    with open('F:/docker/token_count_llm.txt', 'a') as f:
+    with open('token_count_llm.txt', 'a') as f:
         f.write(f"gpt: {current_date_time} {model} {response.usage.total_tokens}\n")
-    # print(response.json())
     return response.choices[0].message.content
 
 
@@ -110,9 +106,8 @@ def call_gpt(sys_prompt, user_prompt, img, model = 'gpt-4.1'):
         print(f"Error: {response.status_code}, {response.text}")
         raise Exception("API call failed")
     current_date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    with open('F:/docker/token_count_gpt.txt', 'a') as f:
+    with open('token_count_gpt.txt', 'a') as f:
         f.write(f"gpt: {current_date_time} {model} {response.json()['usage']['total_tokens']}\n")
-    # print(response.json())
     return response.json()['output'][0]['content'][0]['text']
 
 
@@ -168,7 +163,7 @@ def call_computer_use_preview(sys_prompt, user_prompt, img, model = "computer-us
         print(f"Error: {response.status_code}, {response.text}")
         raise Exception("API call failed")
     current_date_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    with open('F:/docker/token_count_computer.txt', 'a') as f:
+    with open('token_count_computer.txt', 'a') as f:
         f.write(f"computer: {current_date_time} {model} {response.json()['usage']['total_tokens']}\n")
     # print('computer use total tokens: ', response.json()['usage']['total_tokens'])
     return response.json()
@@ -214,7 +209,6 @@ def parse_json(llm_output):
 def initial_task_propose_persona(persona, img):
     sys_prompt = SYS_TASK_INIT_PERSONA
     user_prompt = f"You are {persona}, what task would you perform on the computer?"
-    err_count = 0
     while True:
         try:
             llm_output = call_gpt(sys_prompt, user_prompt, img)
@@ -223,12 +217,6 @@ def initial_task_propose_persona(persona, img):
         except Exception as e:
             print(f"Error: {e}. Retrying...")
             time.sleep(10)
-
-            # err_count += 1
-            # if err_count > 10:
-            #     print("Error count exceeded limit. Exiting...")
-            #     return None
-            
             continue
 
     return task_info
@@ -240,7 +228,6 @@ def followup_task_propose_persona(persona, task_history, img, failed_task = None
     if failed_task:
         user_prompt += f" Note that these tasks {failed_task} are too hard for the agent, propose a simplier one."
 
-    err_count = 0
     while True:
         try:
             llm_output = call_gpt(sys_prompt, user_prompt, img)
@@ -249,12 +236,6 @@ def followup_task_propose_persona(persona, task_history, img, failed_task = None
         except Exception as e:
             print(f"Error: {e}. Retrying...")
             time.sleep(10)
-
-            # err_count += 1
-            # if err_count > 10:
-            #     print("Error count exceeded limit. Exiting...")
-            #     return None
-            
             continue
     return task_info
 
@@ -391,20 +372,33 @@ def generate_verifier_key_screen(task, key_points, img, model = 'gpt-4.1'):
 
 def generate_verifier_verdict(task, key_points, img, model = 'gpt-4.1'):
     sys_prompt = SYS_VERIFIER_VERDICT
-    user_prompt = f"Given the task {task}, the key points to finish the task {key_points}, and the screenshot of an action, is this screenshot a necessary step to complete the task?"
+    user_prompt = f"Given the task {task}, the key points to finish the task {key_points}, and the screenshot history, is the agent successful?"
     while True:
         try:
             llm_output = call_gpt(sys_prompt, user_prompt, img, model)
             verifier_info = parse_json(llm_output)
             thoughts = verifier_info['thoughts']
-            necessary = verifier_info['necessary']
+            success = verifier_info['success']
+            success_rate = verifier_info['success rate']
             break
         except Exception as e:
             print(f"Error: {e}. Retrying...")
             time.sleep(10)
             continue
 
-    return necessary, thoughts
+    return success_rate, success, thoughts
+
+
+def generate_verifier_verdict_key_info(task, img, model = 'gpt-4.1'):
+    key_points, _ = generate_verifier_key_points(task, model)
+    necessary_list = []
+    for item in img:
+        necessary, _ = generate_verifier_key_screen(task, key_points, item, model)
+        necessary_list.append(necessary)
+    
+    img_list_for_verdict = [item for item, necessary in zip(img, necessary_list) if necessary]
+    success_rate, success, thoughts = generate_verifier_verdict(task, key_points, img_list_for_verdict, model)
+    return success_rate, success, thoughts, necessary_list
 
 
 
