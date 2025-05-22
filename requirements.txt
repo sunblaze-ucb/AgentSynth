@@ -1,7 +1,4 @@
 requests
-tqdm
+Pillow
 matplotlib
-pillow
-datasets
-openai 
-desktop_env
+openai
