@@ -1,7 +1,7 @@
 # AgentSynth
 ## AgentSynth: Scalable Task Generation for Generalist Computer-Use Agents
 
-!(Pipeline4.pdf)
+![](https://github.com/sunblaze-ucb/AgentSynth/blob/main/Pipeline4.png?raw=true)
 
 See https://huggingface.co/datasets/sunblaze-ucb/AgentSynth for our data.
 
