@@ -7,7 +7,7 @@ See https://huggingface.co/datasets/sunblaze-ucb/AgentSynth for our data.
 
 Below are instructions to run our pipeline:
 
-### OSWorld
+### Data Generation in OSWorld
 
 Please refer to https://github.com/xlang-ai/OSWorld for environment setup.
 
