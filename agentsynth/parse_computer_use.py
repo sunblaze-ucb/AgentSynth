@@ -53,3 +53,4 @@ def parse_computer_use_pyautogui(data):
     else:
         print(f"Unknown action type: {action_type}")
         return "time.sleep(1)"
+    

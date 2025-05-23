@@ -1,6 +1,8 @@
 #%%
 import sys
 import os
+
+import os
 from desktop_env.desktop_env import DesktopEnv
 from PIL import Image
 from io import BytesIO
@@ -9,7 +11,7 @@ import json
 from datetime import datetime
 import time
 
-from utils import initial_task_propose_persona, followup_task_propose_persona,  generate_action, generate_computer_use_action, generate_summary, generate_verifier, select_persona, encode_image_from_variable, decode_image_from_variable, generate_key_info, generate_subtask_summary
+from utils import initial_task_propose_persona, followup_task_propose_persona,  generate_action, generate_computer_use_action, generate_summary, generate_verifier, generate_verifier_verdict_key_info, select_persona, encode_image_from_variable, decode_image_from_variable, generate_key_info, generate_subtask_summary
 from prompts import EXAMPLE
 
 #%%
@@ -32,7 +34,10 @@ def execute_task(task, env, base64_image, info_history = [], max_steps=10):
                 base64_img_list.append(base64_image)
                 img = Image.open(BytesIO(obs['screenshot']))
                 img_list.append(img)
-            return True, thoughts_history, action_history, command_history, base64_img_list, img_list
+            suc = True
+            # rate, suc, thought = generate_verifier(task, base64_img_list, model='gpt-4.1-mini')
+            # rate, suc, thought, necessary = generate_verifier_verdict_key_info(task, base64_img_list, model='gpt-4.1-mini')
+            return suc, thoughts_history, action_history, command_history, base64_img_list, img_list
 
         python_command = generate_computer_use_action(task, action, command_history, base64_image)
         command_history.append(python_command)
@@ -64,6 +69,7 @@ def update_trace(ret, task_history, task, thoughts, actions, commands, b64_list,
         data_save['screenshots'].append(b64_list)
         data_save['done'].append(True)
     else:
+        failure_task_history.append(task)
         task = generate_subtask_summary(b64_list)
         if task is not None:
             task_history.append(task)
@@ -75,14 +81,13 @@ def update_trace(ret, task_history, task, thoughts, actions, commands, b64_list,
             data_save['commands'].append(commands)
             data_save['screenshots'].append(b64_list)
             data_save['done'].append(False)
-        else:
-            failure_task_history.append(task)
-    
+            
+
     return task_history, info_history, data_save, failure_task_history
 
 #%%
 if __name__ == "__main__":
-    for i in range(5):
+    for i in range(3):
         try:
             while True:
                 with open('lock.txt', 'r') as lock_file:
