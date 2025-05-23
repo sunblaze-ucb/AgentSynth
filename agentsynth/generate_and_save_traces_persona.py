@@ -37,7 +37,7 @@ def execute_task(task, env, base64_image, info_history = [], max_steps=10):
             suc = True
             # rate, suc, thought = generate_verifier(task, base64_img_list, model='gpt-4.1-mini')
             # rate, suc, thought, necessary = generate_verifier_verdict_key_info(task, base64_img_list, model='gpt-4.1-mini')
-            return suc, thoughts_history, action_history, command_history, base64_img_list, img_list
+            return str(suc).lower() == 'true', thoughts_history, action_history, command_history, base64_img_list, img_list
 
         python_command = generate_computer_use_action(task, action, command_history, base64_image)
         command_history.append(python_command)
