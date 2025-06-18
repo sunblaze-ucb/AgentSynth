@@ -1,9 +1,12 @@
 # AgentSynth
+[![ArXiv](https://img.shields.io/badge/arXiv-2506.14205-b31b1b?style=flat&logo=arxiv&logoColor=white)](https://arxiv.org/abs/2506.14205)
+[![Hugging Face](https://img.shields.io/badge/Data-AgentSynth-orange?logo=huggingface&logoColor=white)](https://huggingface.co/datasets/sunblaze-ucb/AgentSynth)
+[![Website](https://img.shields.io/badge/Website-AgentSynth-blue?style=flat&logo=safari&logoColor=white)](https://sunblaze-ucb.github.io/agentsynth_web/)
+
+
 ## AgentSynth: Scalable Task Generation for Generalist Computer-Use Agents
 
 ![](Pipeline4.png?raw=true)
-
-See https://huggingface.co/datasets/sunblaze-ucb/AgentSynth for our data.
 
 Below are instructions to run our pipeline:
 
@@ -42,5 +45,14 @@ python combined_task_generation_new.py --env insta
 For troubleshooting your InSTA installation, refer to their repository at https://github.com/data-for-agents/insta/tree/main.
 
 
-### Data
-https://huggingface.co/datasets/sunblaze-ucb/AgentSynth
+### 📄 Citation
+
+If you use AgentSynth in your research, please cite our paper:
+```bibtex
+@article{xie2025agentsynth,
+  title={AgentSynth: Scalable Task Generation for Generalist Computer-Use Agents},
+  author={Xie, Jingxu and Xu, Dylan and Zhao, Xuandong and Song, Dawn},
+  journal={arXiv preprint arXiv:2506.14205},
+  year={2025}
+}
+```
