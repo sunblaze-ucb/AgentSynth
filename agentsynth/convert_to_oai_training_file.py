@@ -12,12 +12,16 @@ from tqdm import tqdm
 # ============== CONFIG ==============
 REPO_ID = "sunblaze-ucb/AgentSynth"
 OUT_JSONL = "openai_finetune_per_action.jsonl"
+OUT_DIR = "oai_data_files/"
 
 # Use OpenAI Responses-style messages (input_text/input_image + output_text)
 EMIT_MODE = "responses"   # or "chat" for Chat Completions-style
 
 # Keep only successful subtasks (done[t] == True). Set to False to keep all.
 FILTER_SUCCESS_ONLY = True
+
+# File size limits (512 MB = 512 * 1024 * 1024 bytes)
+MAX_FILE_SIZE_BYTES = 512 * 1024 * 1024  # 512 MB
 
 # Dev-time limits
 MAX_ZIPS = None
@@ -85,8 +89,17 @@ def emit_openai_row(system_text: str, user_text: str, image_b64: str, action: st
 def build_jsonl():
     zips = list_zip_paths(REPO_ID)
     total = 0
-
-    with open(OUT_JSONL, "w", encoding="utf-8") as fout:
+    file_count = 0
+    current_file_size = 0
+    
+    # Create output directory if it doesn't exist
+    os.makedirs(OUT_DIR, exist_ok=True)
+    
+    # Initialize first file
+    current_filename = os.path.join(OUT_DIR, f"{OUT_JSONL.replace('.jsonl', '')}_part_{file_count:03d}.jsonl")
+    fout = open(current_filename, "w", encoding="utf-8")
+    
+    try:
         for zp in tqdm(zips, desc="Zip archives"):
             local_zip = hf_hub_download(REPO_ID, filename=zp, repo_type="dataset")
             with ZipFile(local_zip) as zf:
@@ -97,6 +110,7 @@ def build_jsonl():
                 for name in tqdm(inner, desc=f"Files in {os.path.basename(zp)}", leave=False):
                     with zf.open(name) as f:
                         traj = json.load(io.TextIOWrapper(f, encoding="utf-8"))
+                        breakpoint()
 
                     # Task-level arrays (one list per subtask)
                     thoughts_all = traj.get("thoughts") or []
@@ -106,6 +120,12 @@ def build_jsonl():
                     info_history = traj.get("info_history") or []
                     task_hist = traj.get("task_history") or []
                     task_hist_orig = traj.get("task_history_original") or []
+
+                    """
+                    (Pdb) traj.keys()
+                    dict_keys(['thoughts', 'actions', 'commands', 'screenshots', 'done', 'task_history', 
+                    'task_history_original', 'info_history', 'persona', 'summary_task', 'task_levels'])
+                    """
 
                     n_slots = min(len(thoughts_all), len(actions_all), len(screenshots_all), len(done_all))
                     if n_slots == 0:
@@ -146,15 +166,47 @@ def build_jsonl():
 
                             user_text = gen_user_prompt(task_str, info_hist_for_subtask, thoughts_hist_step, actions_hist_step)
                             row = emit_openai_row(SYSTEM_TEXT, user_text, image_i, action_i, thought_i, mode=EMIT_MODE)
-                            fout.write(json.dumps(row, ensure_ascii=False) + "\n")
+                            row_str = json.dumps(row, ensure_ascii=False) + "\n"
+                            
+                            # Check if adding this row would exceed the file size limit
+                            if current_file_size + len(row_str.encode('utf-8')) > MAX_FILE_SIZE_BYTES:
+                                # Close current file and start a new one
+                                fout.close()
+                                print(f"Completed file {current_filename} with {total} rows, size: {current_file_size / (1024*1024):.2f} MB")
+                                
+                                file_count += 1
+                                current_filename = os.path.join(OUT_DIR, f"{OUT_JSONL.replace('.jsonl', '')}_part_{file_count:03d}.jsonl")
+                                fout = open(current_filename, "w", encoding="utf-8")
+                                current_file_size = 0
+                            
+                            fout.write(row_str)
+                            current_file_size += len(row_str.encode('utf-8'))
                             total += 1
 
                             if MAX_ROWS and total >= MAX_ROWS:
                                 print(f"Reached MAX_ROWS={MAX_ROWS}")
-                                print(f"Wrote {total} rows to {OUT_JSONL}")
-                                return
+                                break
+                        
+                        if MAX_ROWS and total >= MAX_ROWS:
+                            break
+                    
+                    if MAX_ROWS and total >= MAX_ROWS:
+                        break
+                
+                if MAX_ROWS and total >= MAX_ROWS:
+                    break
 
-    print(f"Wrote {total} rows to {OUT_JSONL}")
+    finally:
+        fout.close()
+        print(f"Completed file {current_filename} with {total} rows, size: {current_file_size / (1024*1024):.2f} MB")
+
+    print(f"Wrote {total} rows across {file_count + 1} files in {OUT_DIR}")
+    print(f"Files created:")
+    for i in range(file_count + 1):
+        filename = os.path.join(OUT_DIR, f"{OUT_JSONL.replace('.jsonl', '')}_part_{i:03d}.jsonl")
+        if os.path.exists(filename):
+            size_mb = os.path.getsize(filename) / (1024*1024)
+            print(f"  {filename}: {size_mb:.2f} MB")
 
 
 if __name__ == "__main__":

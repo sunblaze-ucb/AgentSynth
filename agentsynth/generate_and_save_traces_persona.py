@@ -11,7 +11,7 @@ import json
 from datetime import datetime
 import time
 
-from utils import initial_task_propose_persona, followup_task_propose_persona,  generate_action, generate_computer_use_action, generate_summary, generate_verifier, generate_verifier_verdict_key_info, select_persona, encode_image_from_variable, decode_image_from_variable, generate_key_info, generate_subtask_summary
+from utils import initial_task_propose_persona, followup_task_propose_persona,  generate_action, generate_computer_use_action, generate_summary, generate_verifier, generate_verifier_verdict_key_info, select_persona, encode_image_from_variable, decode_image_from_variable, generate_key_info, generate_subtask_summary, USE_LOCAL_LLAVA, LOCAL_LLAVA_AVAILABLE
 from prompts import EXAMPLE
 
 #%%
@@ -87,6 +87,17 @@ def update_trace(ret, task_history, task, thoughts, actions, commands, b64_list,
 
 #%%
 if __name__ == "__main__":
+    # Print configuration information
+    print("=" * 50)
+    print("AgentSynth Configuration:")
+    print(f"Use Local LLaVa: {USE_LOCAL_LLAVA}")
+    print(f"Local LLaVa Available: {LOCAL_LLAVA_AVAILABLE}")
+    if USE_LOCAL_LLAVA and LOCAL_LLAVA_AVAILABLE:
+        print("Running with local LLaVa model")
+    else:
+        print("Running with OpenAI API")
+    print("=" * 50)
+    
     for i in range(3):
         try:
             while True:
@@ -148,6 +159,11 @@ if __name__ == "__main__":
             data_save['info_history'] = info_history
             data_save['persona'] = persona
             data_save['summary_task'] = summary_task
+            data_save['config'] = {
+                'use_local_llava': USE_LOCAL_LLAVA,
+                'local_llava_available': LOCAL_LLAVA_AVAILABLE,
+                'model_type': 'local_llava' if USE_LOCAL_LLAVA and LOCAL_LLAVA_AVAILABLE else 'openai'
+            }
 
 
             task_levels = [task_history[0]]

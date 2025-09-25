@@ -177,3 +177,9 @@ cython_debug/
 insta_data/insta
 insta_data/output
 insta_data/secrets.json
+agentsynth/mm_chat
+agentsynth/out_llava_lora*
+agentsynth/mistral
+agentsynth/mistral_data_files*
+agentsynth/oai_data_files*
+agentsynth/osworld_evaluation_results
