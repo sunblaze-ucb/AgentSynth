@@ -183,3 +183,4 @@ agentsynth/mistral
 agentsynth/mistral_data_files*
 agentsynth/oai_data_files*
 agentsynth/osworld_evaluation_results
+agentsynth/evaluation_system/generated_evaluations/generated_evaluation_functions_*.py

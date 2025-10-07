@@ -1,0 +1,20 @@
+# External dependencies for AgentSynth Evaluation System
+# These packages are not included in the main AgentSynth repository
+
+# Computer Vision and Image Processing
+opencv-python>=4.5.0
+Pillow>=8.0.0
+pytesseract>=0.3.8
+numpy>=1.20.0
+
+# Web Automation
+selenium>=4.0.0
+
+# System Monitoring
+psutil>=5.8.0
+
+# HTTP Requests
+requests>=2.25.0
+
+# LLM Integration (OpenAI)
+openai>=1.0.0
