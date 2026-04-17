@@ -4,7 +4,7 @@
 [![Website](https://img.shields.io/badge/Website-AgentSynth-blue?style=flat&logo=safari&logoColor=white)](https://sunblaze-ucb.github.io/agentsynth_web/)
 
 
-## AgentSynth: Scalable Task Generation for Generalist Computer-Use Agents
+## AgentSynth: Scalable Task Generation for Generalist Computer-Use Agents [ICLR 2026]
 
 ![](Pipeline4.png?raw=true)
 
